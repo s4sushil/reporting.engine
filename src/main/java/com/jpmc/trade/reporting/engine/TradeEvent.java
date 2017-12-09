@@ -3,11 +3,16 @@
  */
 package com.jpmc.trade.reporting.engine;
 
+import static org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
 import java.util.Optional;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 /**
  * @author S4Sushil
  *
@@ -169,5 +174,31 @@ public class TradeEvent {
 			return new TradeEvent(this);
 		}
 
+	}
+	
+	//TODO: Can move this to abstract Pojo Class.
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return reflectionHashCode(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		return EqualsBuilder.reflectionEquals(obj, this);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.DEFAULT_STYLE);
 	}
 }
