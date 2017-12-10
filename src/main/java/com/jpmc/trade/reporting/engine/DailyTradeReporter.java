@@ -21,7 +21,6 @@ public class DailyTradeReporter {
 	 * 
 	 */
 	public static Map<LocalDate, BigDecimal> dailyTotalAmountGroupByDate(List<TradeEvent> tradeEvents, String buySellIndicator) {
-		
 		Map<LocalDate, BigDecimal> groupByDate = new HashMap<>();
 		List<TradeEvent> updatedTradeEvents = filterAndUpdateSettlementDates(tradeEvents, buySellIndicator);
 		
@@ -34,7 +33,15 @@ public class DailyTradeReporter {
 									.multiply(tradeEvent.getPricePerUnit().orElse(BigDecimal.ZERO)))
 							.reduce(BigDecimal.ZERO, BigDecimal::add))
 						);
+		
 		return groupByDate;
+	}
+
+	public static void generateTotalAmountReport(List<TradeEvent> tradeEvents, String buySellIndicator) {
+		System.out.println("List of total amount listed below for Action: " + buySellIndicator);
+		dailyTotalAmountGroupByDate(tradeEvents, buySellIndicator).forEach((date, amt) -> {
+			System.out.println(" on Date: " + date + " total amt" + amt);
+		});
 	}
 
 	public static Map<LocalDate, String> findRankingGroupByDate(List<TradeEvent> tradeEvents, String buySellIndicator) {
@@ -53,6 +60,13 @@ public class DailyTradeReporter {
 									.multiply(tradeEvent1.getPricePerUnit().orElse(BigDecimal.ZERO))))
 							.findFirst().map(event -> event.getStockName().orElse("")).orElse("")));
 		return rankByDate;
+	}
+	
+	public static void generateRankingReport(List<TradeEvent> tradeEvents, String buySellIndicator) {
+		System.out.println("Top Stock Name for Action: " + buySellIndicator);
+		findRankingGroupByDate(tradeEvents, buySellIndicator).forEach((date, entity) -> {
+			System.out.println(" on Date: " + date + " topper is stock " + entity);
+		});
 	}
 	
 	private static List<TradeEvent> filterAndUpdateSettlementDates(List<TradeEvent> tradeEvents,

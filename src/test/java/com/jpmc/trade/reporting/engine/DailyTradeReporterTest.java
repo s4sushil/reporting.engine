@@ -33,6 +33,11 @@ public class DailyTradeReporterTest {
 		List<TradeEvent> tradeEvents = ImmutableList.of(t1, t2, t3);
 		Map<LocalDate, BigDecimal> actualAmount = DailyTradeReporter.dailyTotalAmountGroupByDate(tradeEvents, buySellIndicator);
 		assertThat(actualAmount.get(updatedSettlementToWeekDay), is(expectedResult));
+		
+		//Generates the daily amount report
+		System.out.println("");
+		System.out.println(" *** Generates Total Amount Report *** ");
+		DailyTradeReporter.generateTotalAmountReport(tradeEvents, buySellIndicator);
 	}
 
 	public static class TradeEventProvider {
@@ -109,6 +114,11 @@ public class DailyTradeReporterTest {
 		List<TradeEvent> tradeEvents = ImmutableList.of(t1, t2, t3);
 		Map<LocalDate, String> actualAmount = DailyTradeReporter.findRankingGroupByDate(tradeEvents, buySellIndicator);
 		assertThat(actualAmount.get(settlementDayWednesday), is(expectedResult));
+
+		//Generates the daily rank report
+		System.out.println("");
+		System.out.println(" *** Generates Top Rankers Report *** ");
+		DailyTradeReporter.generateRankingReport(tradeEvents, buySellIndicator);
 	}
 	
 	public static class TradeEventRankProvider {
