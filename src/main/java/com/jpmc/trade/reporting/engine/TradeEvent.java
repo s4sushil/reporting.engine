@@ -22,10 +22,10 @@ public class TradeEvent {
 	private final Optional<String> stockName;
 	private final Optional<String> buySellIndicator;
 	private final Optional<LocalDate> instructionDate;
-	private final Optional<LocalDate> settlementDate;
+	private Optional<LocalDate> settlementDate;
 	private final Optional<Currency> currency;
 	private final Optional<BigDecimal> agreedFx;
-	private final Optional<BigDecimal> units;
+	private final Optional<Integer> units;
 	private final Optional<BigDecimal> pricePerUnit; 
 
 	private TradeEvent(TradeEvent.TradeEventBuilder builder) {
@@ -84,7 +84,7 @@ public class TradeEvent {
 	/**
 	 * @return the units
 	 */
-	public Optional<BigDecimal> getUnits() {
+	public Optional<Integer> getUnits() {
 		return units;
 	}
 
@@ -95,6 +95,13 @@ public class TradeEvent {
 		return pricePerUnit;
 	}
 
+	/**
+	 * Created the mutable method.
+	 */
+	public void setSettlementDate(Optional<LocalDate> date) {
+		this.settlementDate = date;
+	}
+	
 	public static TradeEventBuilder tradeEvent() {
 		return new TradeEventBuilder();
 	}
@@ -106,7 +113,7 @@ public class TradeEvent {
 		private Optional<LocalDate> settlementDate = Optional.empty();
 		private Optional<Currency> currency = Optional.empty();
 		private Optional<BigDecimal> agreedFx = Optional.empty();
-		private Optional<BigDecimal> units = Optional.empty();
+		private Optional<Integer> units = Optional.empty();
 		private Optional<BigDecimal> pricePerUnit = Optional.empty();
 		
 		/**
@@ -154,7 +161,7 @@ public class TradeEvent {
 		/**
 		 * @param units the units to set
 		 */
-		public TradeEventBuilder setUnits(Optional<BigDecimal> units) {
+		public TradeEventBuilder setUnits(Optional<Integer> units) {
 			this.units = units;
 			return this;
 		}
