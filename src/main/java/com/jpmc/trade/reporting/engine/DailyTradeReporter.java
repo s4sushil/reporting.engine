@@ -40,7 +40,7 @@ public class DailyTradeReporter {
 	public static void generateTotalAmountReport(List<TradeEvent> tradeEvents, String buySellIndicator) {
 		System.out.println("List of total amount listed below for Action: " + buySellIndicator);
 		dailyTotalAmountGroupByDate(tradeEvents, buySellIndicator).forEach((date, amt) -> {
-			System.out.println(" on Date: " + date + " total amt" + amt);
+			System.out.println(" on Date: " + date + " total amt <" + amt + ">");
 		});
 	}
 
@@ -65,7 +65,7 @@ public class DailyTradeReporter {
 	public static void generateRankingReport(List<TradeEvent> tradeEvents, String buySellIndicator) {
 		System.out.println("Top Stock Name for Action: " + buySellIndicator);
 		findRankingGroupByDate(tradeEvents, buySellIndicator).forEach((date, entity) -> {
-			System.out.println(" on Date: " + date + " topper is stock " + entity);
+			System.out.println(" on Date: " + date + " topper is stock <" + entity +">");
 		});
 	}
 	
