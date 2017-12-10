@@ -27,8 +27,8 @@ public class DailyTradeReporter {
 		
 		updatedTradeEvents.stream()
 				.collect(Collectors.groupingBy(TradeEvent::getSettlementDate, Collectors.toList()))
-				.forEach((date, set) -> 
-						groupByDate.put(date.get(), set.stream()
+				.forEach((date, list) -> 
+						groupByDate.put(date.get(), list.stream()
 							.map(tradeEvent -> tradeEvent.getAgreedFx().orElse(BigDecimal.ZERO)
 									.multiply(BigDecimal.valueOf(tradeEvent.getUnits().orElse(0)))
 									.multiply(tradeEvent.getPricePerUnit().orElse(BigDecimal.ZERO)))
@@ -37,6 +37,24 @@ public class DailyTradeReporter {
 		return groupByDate;
 	}
 
+	public static Map<LocalDate, String> findRankingGroupByDate(List<TradeEvent> tradeEvents, String buySellIndicator) {
+		Map<LocalDate, String> rankByDate = new HashMap<>();
+		List<TradeEvent> updatedTradeEvents = filterAndUpdateSettlementDates(tradeEvents, buySellIndicator);
+		
+		updatedTradeEvents.stream()
+				.collect(Collectors.groupingBy(TradeEvent::getSettlementDate, Collectors.toList()))
+				.forEach((date, list) -> rankByDate
+						.put(date.get(), list.stream()
+							.sorted((tradeEvent1, tradeEvent2) -> tradeEvent2.getAgreedFx().orElse(BigDecimal.ZERO)
+									.multiply(BigDecimal.valueOf(tradeEvent2.getUnits().orElse(0)))
+									.multiply(tradeEvent2.getPricePerUnit().orElse(BigDecimal.ZERO))
+							.compareTo(tradeEvent1.getAgreedFx().orElse(BigDecimal.ZERO)
+									.multiply(BigDecimal.valueOf(tradeEvent1.getUnits().orElse(0)))
+									.multiply(tradeEvent1.getPricePerUnit().orElse(BigDecimal.ZERO))))
+							.findFirst().map(event -> event.getStockName().orElse("")).orElse("")));
+		return rankByDate;
+	}
+	
 	private static List<TradeEvent> filterAndUpdateSettlementDates(List<TradeEvent> tradeEvents,
 			String buySellIndicator) {
 

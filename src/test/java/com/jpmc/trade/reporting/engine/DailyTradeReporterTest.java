@@ -101,6 +101,81 @@ public class DailyTradeReporterTest {
 		}
 	}
 	
+	@Test
+	@Parameters(source = TradeEventRankProvider.class)
+	public void rankingByDate(TradeEvent t1, TradeEvent t2, TradeEvent t3, LocalDate settlementDayWednesday,  
+								 String buySellIndicator, String expectedResult) {
+
+		List<TradeEvent> tradeEvents = ImmutableList.of(t1, t2, t3);
+		Map<LocalDate, String> actualAmount = DailyTradeReporter.findRankingGroupByDate(tradeEvents, buySellIndicator);
+		assertThat(actualAmount.get(settlementDayWednesday), is(expectedResult));
+	}
+	
+	public static class TradeEventRankProvider {
+		public static Object[][] provideRanking() {
+            LocalDate wednesday = LocalDate.of(2017, 12, 06);
+			
+            TradeEvent buyTradeAmt500 = createTradeEvent(Optional.of("JPMC"), Optional.of(Currency.getInstance("AED")),
+            		Optional.of("B"), Optional.of(wednesday), Optional.of(5));
+            
+            TradeEvent buyTradeAmt1000 = createTradeEvent(Optional.of("MS"), Optional.of(Currency.getInstance("AED")),
+            		Optional.of("B"), Optional.of(wednesday), Optional.of(10));
+            
+            TradeEvent buyTradeAmt1500 = createTradeEvent(Optional.of("Apple"), Optional.of(Currency.getInstance("SAR")),
+            		Optional.of("B"), Optional.of(wednesday), Optional.of(15));
+
+            TradeEvent actionEventEmpty = createTradeEvent(Optional.of("None"), Optional.of(Currency.getInstance("SAR")),
+            		Optional.empty(), Optional.of(wednesday), Optional.of(5));
+            
+            TradeEvent numberOfUnitEmpty = createTradeEvent(Optional.of("Other"), Optional.of(Currency.getInstance("AED")),
+            		Optional.of("B"), Optional.of(wednesday), Optional.empty());
+                        
+            TradeEvent sellTradeAmt5000 = createTradeEvent(Optional.of("JPMC"), Optional.of(Currency.getInstance("USD")),
+            		Optional.of("S"), Optional.of(wednesday), Optional.of(50));
+
+            TradeEvent sellTradeAmt2000 = createTradeEvent(Optional.of("MS"), Optional.of(Currency.getInstance("GBP")),
+            		Optional.of("S"), Optional.of(wednesday), Optional.of(20));
+
+            TradeEvent sellTradeAmt3000 = createTradeEvent(Optional.of("MS"), Optional.of(Currency.getInstance("INR")),
+            		Optional.of("S"), Optional.of(wednesday), Optional.of(30));
+            
+			return new Object[][] {
+				//Passing 3 Arab currency BUY trades for wed hence settlementDate will be same day. 
+				//Action filter is Buy so, highest amt is 1500 for entity Apple.
+            	{buyTradeAmt500, buyTradeAmt1000, buyTradeAmt1500, wednesday, "B", "Apple"},
+            	
+            	//Passing 3 Arab currency BUY trades for wed hence settlementDate will be same day. 
+            	//Action filter is Sell hence expected nothing.
+            	{buyTradeAmt500, buyTradeAmt1000, buyTradeAmt1500, wednesday, "S", null},
+
+            	//Passing 2 Arab currency BUY trades and 1 Optional empty Action for wed hence settlementDate will be same day.
+            	//Indicator is Buy and highest total is 1000 for entity MS
+            	{buyTradeAmt500, buyTradeAmt1000, actionEventEmpty, wednesday, "B", "MS"},
+
+            	//Passing 2 Arab currency BUY trades and 1 Optional empty Action for wed hence settlementDate will be same day.
+            	//Indicator is Buy(ignore case) and highest total is 1000 for entity MS
+            	{buyTradeAmt500, buyTradeAmt1000, actionEventEmpty, wednesday, "b", "MS"},
+            	
+            	//Passing 1 Arab currency BUY trades, 1 empty number of unit and 1 Optional empty Action. 
+            	//Indicator is Buy and highest total is 500 for entity MS
+            	{buyTradeAmt500, numberOfUnitEmpty, actionEventEmpty, wednesday, "B", "JPMC"},
+            	
+				//Passing 3 Non Arab currency SELL trades for wed hence settlementDate will be same day..
+            	//Action filter is Sell and highest total is 5000 for entity MS
+            	{sellTradeAmt5000, sellTradeAmt2000, sellTradeAmt3000, wednesday, "S", "JPMC"},
+
+				//Passing 3 Non Arab currency SELL trades for wed hence settlementDate will be same day..
+            	//Action filter is BUY so, nothing expected.
+            	{sellTradeAmt5000, sellTradeAmt2000, sellTradeAmt3000, wednesday, "B", null},
+            	
+				//Passing 1 Non Arab currency SELL trades, 1 empty number of unit and 1 Optional empty Action.
+            	//Action filter is Sell and highest total is 5000 for entity MS
+            	{sellTradeAmt5000, numberOfUnitEmpty, actionEventEmpty, wednesday, "S", "JPMC"},
+            	
+            };
+		}
+	}
+	
 	private static TradeEvent createTradeEvent(Optional<String> entity, Optional<Currency> currency, Optional<String> buySell,
 											   Optional<LocalDate> originalSettlementDate, Optional<Integer> units) {
 		
